@@ -1,0 +1,25 @@
+{
+  "programming": ["python", "java", "c++"],
+  "ml_fundamentals": [
+    "linear regression",
+    "logistic regression",
+    "classification",
+    "clustering"
+  ],
+  "ml_tools": [
+    "scikit-learn",
+    "numpy",
+    "pandas"
+  ],
+  "deep_learning": [
+    "neural networks",
+    "cnn",
+    "rnn",
+    "transformers"
+  ],
+  "ml_ops": [
+    "docker",
+    "mlflow",
+    "model deployment"
+  ]
+}
