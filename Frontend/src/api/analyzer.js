@@ -15,3 +15,8 @@ export async function analyzeResume(file) {
 
   return res.json();
 }
+
+export async function getJobRoles() {
+  const res = await fetch("http://127.0.0.1:8000/job-roles");
+  return res.json();
+}

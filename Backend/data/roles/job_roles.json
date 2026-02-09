@@ -1,0 +1,67 @@
+{
+  "tech": {
+    "ml_engineer": {
+      "label": "ML Engineer",
+      "skills": {
+        "python": 0.8,
+        "numpy": 0.7,
+        "pandas": 0.7,
+        "scikit-learn": 0.8,
+        "classification": 0.7,
+        "clustering": 0.6,
+        "docker": 0.6,
+        "model deployment": 0.6
+      }
+    },
+    "frontend_developer": {
+      "label": "Frontend Developer",
+      "skills": {
+        "html": 0.7,
+        "css": 0.7,
+        "javascript": 0.8,
+        "react": 0.8,
+        "tailwind": 0.6
+      }
+    },
+    "backend_developer": {
+      "label": "Backend Developer",
+      "skills": {
+        "python": 0.7,
+        "java": 0.7,
+        "sql": 0.7,
+        "api development": 0.8,
+        "database design": 0.6
+      }
+    }
+  },
+
+  "non_tech": {
+    "business_analyst": {
+      "label": "Business Analyst",
+      "skills": {
+        "excel": 0.8,
+        "data analysis": 0.7,
+        "communication": 0.8,
+        "documentation": 0.6
+      }
+    },
+    "hr_executive": {
+      "label": "HR Executive",
+      "skills": {
+        "recruitment": 0.8,
+        "communication": 0.8,
+        "employee relations": 0.6,
+        "hr tools": 0.6
+      }
+    },
+    "digital_marketer": {
+      "label": "Digital Marketer",
+      "skills": {
+        "seo": 0.7,
+        "content marketing": 0.7,
+        "social media": 0.8,
+        "analytics": 0.6
+      }
+    }
+  }
+}

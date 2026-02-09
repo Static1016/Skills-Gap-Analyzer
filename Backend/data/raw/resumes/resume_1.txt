@@ -1,3 +1,0 @@
-I have experience with Python, Pandas, NumPy and basic machine learning
-algorithms like linear regression and classification.
-I have built small ML models using scikit-learn.
