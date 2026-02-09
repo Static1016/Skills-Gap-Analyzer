@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-
+from src.utils.skill_flatten import extract_all_skills_from_roles
 from src.preprocessing.text_cleaner import clean_text
 from src.preprocessing.job_parser import extract_job_description
 from src.extraction.skill_extractor import extract_skills
@@ -8,6 +8,7 @@ from src.scoring.job_matcher import match_resume_to_job
 from src.recommendation.recommender import recommend_learning
 from src.utils.skill_loader import load_skills
 from src.utils.pdf_reader import extract_text_from_pdf
+
 
 # -----------------------
 # APP INIT
@@ -33,7 +34,11 @@ SKILLS_PATH = "data/skills/skills.json"
 RESOURCES_PATH = "data/skills/learning_resources.json"
 ROLES_PATH = "data/roles/job_roles.json"
 
-skills_dict = load_skills(SKILLS_PATH)
+
+
+roles_dict = load_skills("data/roles/job_roles.json")
+skills_dict = extract_all_skills_from_roles(roles_dict)
+
 resources_dict = load_skills(RESOURCES_PATH)
 roles_dict = load_skills(ROLES_PATH)
 

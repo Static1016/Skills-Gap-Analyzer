@@ -1,8 +1,11 @@
 from sentence_transformers import SentenceTransformer, util
-import numpy as np
 
 # Load embedding model once
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+
+# Tunable constants
+RULE_BASED_CONFIDENCE = 0.7   # strong but not perfect
+EMBEDDING_MAX_CONFIDENCE = 0.6
 
 
 def normalize_text(text: str) -> str:
@@ -12,7 +15,7 @@ def normalize_text(text: str) -> str:
 def extract_skills_rule_based(tokens, skills_dict):
     """
     Detects skills using substring matching.
-    Works for multi-word skills.
+    Assigns strong but non-perfect confidence.
     """
     scores = {}
     joined_text = " ".join(tokens)
@@ -20,7 +23,7 @@ def extract_skills_rule_based(tokens, skills_dict):
     for skill in skills_dict:
         skill_lower = skill.lower()
         if skill_lower in joined_text:
-            scores[skill_lower] = 1.0
+            scores[skill_lower] = RULE_BASED_CONFIDENCE
 
     return scores
 
@@ -28,6 +31,7 @@ def extract_skills_rule_based(tokens, skills_dict):
 def extract_skills_embedding_based(text, skills_dict, threshold=0.45):
     """
     Uses sentence embeddings to detect semantically similar skills.
+    Produces soft confidence scores.
     """
     scores = {}
 
@@ -45,21 +49,27 @@ def extract_skills_embedding_based(text, skills_dict, threshold=0.45):
         similarity = util.cos_sim(text_embedding, skill_embedding).item()
 
         if similarity >= threshold:
-            scores[skill_lower] = round(float(similarity), 2)
+            # scale similarity to soft confidence
+            scores[skill_lower] = min(
+                round(float(similarity), 2),
+                EMBEDDING_MAX_CONFIDENCE
+            )
 
     return scores
 
 
 def combine_skill_scores(rule_scores, embed_scores):
+    """
+    Combines rule-based and embedding-based signals.
+    Rule-based dominates but does NOT saturate to 1.0.
+    """
     combined = {}
 
     for skill in set(rule_scores) | set(embed_scores):
-        # rule-based = strong signal
-        if skill in rule_scores:
-            combined[skill] = 1.0
-        else:
-            # embedding-based = soft signal
-            combined[skill] = embed_scores.get(skill, 0.0)
+        combined[skill] = max(
+            rule_scores.get(skill, 0.0),
+            embed_scores.get(skill, 0.0)
+        )
 
     return combined
 
@@ -67,6 +77,7 @@ def combine_skill_scores(rule_scores, embed_scores):
 def extract_skills(text, skills_dict):
     """
     Unified skill extraction pipeline.
+    Returns confidence scores in range ~0.3–0.7
     """
     text = normalize_text(text)
     tokens = text.split()
