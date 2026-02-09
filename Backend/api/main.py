@@ -16,8 +16,16 @@ from src.recommendation.recommender import (
     load_resources,
     recommend_learning
 )
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Skill Gap Analyzer API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 skills_dict = load_skills()
 resources_dict = load_resources()
