@@ -6,14 +6,17 @@ export default function ResumeUpload({ onResult }) {
   const [loading, setLoading] = useState(false);
 
   const handleAnalyze = async () => {
-    if (!file) return alert("Please upload a PDF resume");
-    setLoading(true);
+    if (!file) {
+      alert("Please upload a PDF resume");
+      return;
+    }
 
+    setLoading(true);
     try {
       const data = await analyzeResume(file);
       onResult(data);
     } catch (err) {
-      alert("Analysis failed");
+      alert("Analysis failed. Check backend.");
     } finally {
       setLoading(false);
     }
@@ -31,7 +34,9 @@ export default function ResumeUpload({ onResult }) {
       <button
         onClick={handleAnalyze}
         disabled={loading}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        className={`w-full px-4 py-2 rounded text-white ${
+          loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+        }`}
       >
         {loading ? "Analyzing..." : "Analyze Resume"}
       </button>

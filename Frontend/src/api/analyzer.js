@@ -10,7 +10,7 @@ export async function analyzeResume(file) {
   });
 
   if (!res.ok) {
-    throw new Error("API Error");
+    throw new Error("Resume analysis failed");
   }
 
   return res.json();
