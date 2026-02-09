@@ -1,0 +1,23 @@
+{
+  "classification": [
+    "Logistic Regression basics",
+    "Decision Trees",
+    "Model evaluation metrics"
+  ],
+  "clustering": [
+    "K-Means algorithm",
+    "Hierarchical clustering"
+  ],
+  "docker": [
+    "Docker fundamentals",
+    "Docker for ML models"
+  ],
+  "model deployment": [
+    "FastAPI for ML",
+    "Deploying ML models"
+  ],
+  "pandas": [
+    "Advanced Pandas operations",
+    "Data cleaning with Pandas"
+  ]
+}
