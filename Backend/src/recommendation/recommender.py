@@ -1,24 +1,23 @@
+def recommend_learning(gap_result, resources_dict):
+    """
+    Generates learning recommendations for missing or weak skills.
+    Safe against partial gap schemas.
+    """
 
-import json
-
-RESOURCES_PATH = "data/skills/learning_resources.json"
-
-def load_resources():
-    with open(RESOURCES_PATH, "r") as f:
-        return json.load(f)
-
-
-def recommend_learning(gap_result: dict, resources: dict, max_items=5):
     recommendations = []
 
-    for skill in gap_result["missing"] + gap_result["weak"]:
-        if skill in resources:
-            recommendations.append({
-                "skill": skill,
-                "resources": resources[skill]
-            })
+    missing = gap_result.get("missing", [])
+    weak = gap_result.get("weak", [])
 
-        if len(recommendations) >= max_items:
-            break
+    all_gaps = set(missing + weak)
+
+    for skill in all_gaps:
+        skill_lower = skill.lower()
+
+        if skill_lower in resources_dict:
+            recommendations.append({
+                "skill": skill_lower,
+                "resources": resources_dict[skill_lower]
+            })
 
     return recommendations

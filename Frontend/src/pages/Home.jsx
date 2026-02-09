@@ -1,40 +1,132 @@
 import { useState } from "react";
+import Header from "../components/Header";
 import JobSelector from "../components/JobSelector";
-import ResumeUpload from "../components/ResumeUpload";
 import ResultCard from "../components/ResultCard";
+
+const API_BASE = "http://127.0.0.1:8000";
 
 export default function Home() {
   const [category, setCategory] = useState("");
   const [role, setRole] = useState("");
+  const [jobUrl, setJobUrl] = useState("");
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
 
+  const handleAnalyze = async () => {
+    if (!category || !role) {
+      alert("Please select job category and role.");
+      return;
+    }
+
+    if (!jobUrl) {
+      alert("Please paste a job opening link.");
+      return;
+    }
+
+    if (!file) {
+      alert("Please upload a resume PDF.");
+      return;
+    }
+
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(
+        `${API_BASE}/analyze-job?category=${category}&role=${role}&job_input=${encodeURIComponent(jobUrl)}`,
+        {
+          method: "POST",
+          body: formData
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Backend error");
+      }
+
+      const data = await response.json();
+      setResult(data);
+    } catch (err) {
+      console.error(err);
+      alert("Analysis failed. Try another job link.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 px-6 py-10">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <h1 className="text-3xl font-bold text-center mb-8">
-          Skill Gap Analyzer
-        </h1>
+    <div className="min-h-screen bg-gray-50">
+      <Header />
 
-        {/* Job Selection */}
-        <JobSelector
-          onSelect={(selectedCategory, selectedRole) => {
-            setCategory(selectedCategory);
-            setRole(selectedRole);
-            setResult(null); // reset previous result
-          }}
-        />
+      <main className="max-w-6xl mx-auto px-6 py-10 space-y-6">
+        {/* Step 1: Role Selection */}
+        <div className="bg-white rounded-xl shadow p-6">
+          <h3 className="font-semibold mb-4">
+            1. Select Job Category & Role
+          </h3>
+          <JobSelector
+            onSelect={(c, r) => {
+              setCategory(c);
+              setRole(r);
+              setResult(null);
+            }}
+          />
+        </div>
 
-        {/* Resume Upload */}
-        <ResumeUpload
-          category={category}
-          role={role}
-          onResult={setResult}
-        />
+        {/* Step 2: Job Link */}
+        <div className="bg-white rounded-xl shadow p-6">
+          <h3 className="font-semibold mb-4">
+            2. Paste Job Opening Link
+          </h3>
+          <input
+            type="url"
+            placeholder="https://company.com/careers/job-opening"
+            value={jobUrl}
+            onChange={(e) => setJobUrl(e.target.value)}
+            className="border p-2 w-full"
+          />
+        </div>
+
+        {/* Step 3: Resume Upload */}
+        <div className="bg-white rounded-xl shadow p-6">
+          <h3 className="font-semibold mb-4">
+            3. Upload Resume (PDF)
+          </h3>
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={(e) => setFile(e.target.files[0])}
+          />
+        </div>
+
+        {/* Analyze Button */}
+        <button
+          onClick={handleAnalyze}
+          disabled={loading}
+          className={`w-full py-3 rounded text-white font-medium ${
+            loading
+              ? "bg-gray-400"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
+        >
+          {loading ? "Analyzing..." : "Analyze Resume vs Job"}
+        </button>
 
         {/* Results */}
-        {result && <ResultCard data={result} />}
-      </div>
+        {result && (
+          <div className="bg-white rounded-xl shadow p-6">
+            <ResultCard data={result} />
+          </div>
+        )}
+      </main>
+
+      <footer className="mt-16 py-6 text-center text-sm text-gray-500">
+        © {new Date().getFullYear()} Skill Gap Analyzer
+      </footer>
     </div>
   );
 }

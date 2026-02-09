@@ -1,5 +1,5 @@
 {
-  "tech": {
+  "Tech": {
     "ml_engineer": {
       "label": "ML Engineer",
       "skills": {
@@ -35,7 +35,7 @@
     }
   },
 
-  "non_tech": {
+  "Non_Tech": {
     "business_analyst": {
       "label": "Business Analyst",
       "skills": {

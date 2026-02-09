@@ -1,62 +1,77 @@
-
-import json
-from pathlib import Path
-from collections import defaultdict
 from sentence_transformers import SentenceTransformer, util
+import numpy as np
 
-SKILLS_PATH = "data/skills/skills.json"
-
-# Load SBERT model once
-model = SentenceTransformer("all-MiniLM-L6-v2")
-
-
-def load_skills():
-    with open(SKILLS_PATH, "r") as f:
-        return json.load(f)
+# Load embedding model once
+embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
-def extract_skills_rule_based(tokens: list, skills_dict: dict) -> dict:
-    skill_freq = defaultdict(int)
-    token_text = " ".join(tokens)
-
-    for category, skills in skills_dict.items():
-        for skill in skills:
-            skill_clean = skill.lower()
-            if skill_clean in token_text:
-                skill_freq[skill_clean] += token_text.count(skill_clean)
-
-    return dict(skill_freq)
+def normalize_text(text: str) -> str:
+    return " ".join(text.lower().split())
 
 
-def extract_skills_embedding_based(text: str, skills_dict: dict, threshold=0.6):
-    skill_scores = {}
+def extract_skills_rule_based(tokens, skills_dict):
+    """
+    Detects skills using substring matching.
+    Works for multi-word skills.
+    """
+    scores = {}
+    joined_text = " ".join(tokens)
 
-    skill_list = []
-    for skills in skills_dict.values():
-        skill_list.extend(skills)
+    for skill in skills_dict:
+        skill_lower = skill.lower()
+        if skill_lower in joined_text:
+            scores[skill_lower] = 1.0
 
-    text_embedding = model.encode(text, convert_to_tensor=True)
-    skill_embeddings = model.encode(skill_list, convert_to_tensor=True)
-
-    similarities = util.cos_sim(text_embedding, skill_embeddings)[0]
-
-    for skill, score in zip(skill_list, similarities):
-        if score >= threshold:
-            skill_scores[skill.lower()] = float(score)
-
-    return skill_scores
+    return scores
 
 
-def combine_skill_scores(rule_scores: dict, embed_scores: dict) -> dict:
-    final_scores = {}
-    all_skills = set(rule_scores.keys()).union(embed_scores.keys())
+def extract_skills_embedding_based(text, skills_dict, threshold=0.45):
+    """
+    Uses sentence embeddings to detect semantically similar skills.
+    """
+    scores = {}
 
-    for skill in all_skills:
-        freq_score = min(rule_scores.get(skill, 0) / 5, 1.0)
-        embed_score = embed_scores.get(skill, 0.0)
+    if not text.strip():
+        return scores
 
-        final_scores[skill] = round(
-            0.6 * freq_score + 0.4 * embed_score, 3
+    text_embedding = embedding_model.encode(text, convert_to_tensor=True)
+
+    for skill in skills_dict:
+        skill_lower = skill.lower()
+        skill_embedding = embedding_model.encode(
+            skill_lower, convert_to_tensor=True
         )
 
-    return final_scores
+        similarity = util.cos_sim(text_embedding, skill_embedding).item()
+
+        if similarity >= threshold:
+            scores[skill_lower] = round(float(similarity), 2)
+
+    return scores
+
+
+def combine_skill_scores(rule_scores, embed_scores):
+    combined = {}
+
+    for skill in set(rule_scores) | set(embed_scores):
+        # rule-based = strong signal
+        if skill in rule_scores:
+            combined[skill] = 1.0
+        else:
+            # embedding-based = soft signal
+            combined[skill] = embed_scores.get(skill, 0.0)
+
+    return combined
+
+
+def extract_skills(text, skills_dict):
+    """
+    Unified skill extraction pipeline.
+    """
+    text = normalize_text(text)
+    tokens = text.split()
+
+    rule_scores = extract_skills_rule_based(tokens, skills_dict)
+    embed_scores = extract_skills_embedding_based(text, skills_dict)
+
+    return combine_skill_scores(rule_scores, embed_scores)

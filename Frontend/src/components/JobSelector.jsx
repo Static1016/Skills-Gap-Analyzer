@@ -1,47 +1,68 @@
 import { useEffect, useState } from "react";
-import { getJobRoles } from "../api/analyzer";
+
+const API_BASE = "http://127.0.0.1:8000";
 
 export default function JobSelector({ onSelect }) {
-  const [roles, setRoles] = useState({});
+  const [rolesData, setRolesData] = useState({});
   const [category, setCategory] = useState("");
   const [role, setRole] = useState("");
 
   useEffect(() => {
-    getJobRoles().then(setRoles);
+    fetch(`${API_BASE}/job-roles`)
+      .then((res) => res.json())
+      .then((data) => setRolesData(data))
+      .catch((err) => console.error("Failed to load roles", err));
   }, []);
 
-  useEffect(() => {
-    if (category && role) {
-      onSelect(category, role);
-    }
-  }, [category, role]);
+  const categories = Object.keys(rolesData);
+  const roles =
+    category && rolesData[category]
+      ? Object.keys(rolesData[category])
+      : [];
+
+  const handleCategoryChange = (e) => {
+    const selected = e.target.value;
+    setCategory(selected);
+    setRole("");
+    onSelect(selected, "");
+  };
+
+  const handleRoleChange = (e) => {
+    const selected = e.target.value;
+    setRole(selected);
+    onSelect(category, selected);
+  };
 
   return (
-    <div className="bg-white p-6 rounded shadow mb-6">
+    <div className="space-y-4">
+      {/* Category Dropdown */}
       <select
-        className="border p-2 w-full mb-4"
-        onChange={(e) => {
-          setCategory(e.target.value);
-          setRole("");
-        }}
+        value={category}
+        onChange={handleCategoryChange}
+        className="border p-2 w-full"
       >
-        <option value="">Select Job Category</option>
-        {Object.keys(roles).map((c) => (
-          <option key={c} value={c}>{c}</option>
+        <option value="">Select category</option>
+        {categories.map((cat) => (
+          <option key={cat} value={cat}>
+            {cat.toUpperCase()}
+          </option>
         ))}
       </select>
 
-      {category && (
-        <select
-          className="border p-2 w-full"
-          onChange={(e) => setRole(e.target.value)}
-        >
-          <option value="">Select Job Role</option>
-          {Object.entries(roles[category]).map(([key, label]) => (
-            <option key={key} value={key}>{label}</option>
-          ))}
-        </select>
-      )}
+      {/* Role Dropdown */}
+      <select
+        value={role}
+        onChange={handleRoleChange}
+        className="border p-2 w-full"
+        disabled={!category}
+      >
+        <option value="">Select role</option>
+        {roles.map((r) => (
+          <option key={r} value={r}>
+            {r.replace(/_/g, " ").toUpperCase()}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }

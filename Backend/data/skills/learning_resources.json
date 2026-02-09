@@ -1,23 +1,162 @@
 {
-  "classification": [
-    "Logistic Regression basics",
-    "Decision Trees",
-    "Model evaluation metrics"
+  "python": [
+    {
+      "title": "Python Full Course for Beginners",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=rfscVS0vtbw"
+    }
   ],
-  "clustering": [
-    "K-Means algorithm",
-    "Hierarchical clustering"
+  "java": [
+    {
+      "title": "Java Full Course",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=grEKMHGYyns"
+    }
+  ],
+  "sql": [
+    {
+      "title": "SQL Full Course for Beginners",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=HXV3zeQKqGY"
+    },
+    {
+      "title": "Advanced SQL Queries",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=9Pzj7Aj25lw"
+    }
+  ],
+  "api development": [
+    {
+      "title": "REST API Development with FastAPI",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=0sOvCWFmrtA"
+    }
+  ],
+  "database design": [
+    {
+      "title": "Database Design Fundamentals",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=ztHopE5Wnpc"
+    }
   ],
   "docker": [
-    "Docker fundamentals",
-    "Docker for ML models"
+    {
+      "title": "Docker Tutorial for Beginners",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=fqMOX6JJhGo"
+    }
   ],
-  "model deployment": [
-    "FastAPI for ML",
-    "Deploying ML models"
+  "machine learning": [
+    {
+      "title": "Machine Learning Full Course",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=Gv9_4yMHFhI"
+    }
   ],
-  "pandas": [
-    "Advanced Pandas operations",
-    "Data cleaning with Pandas"
+
+  "excel": [
+    {
+      "title": "Excel Full Course for Business Analysts",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=Vl0H-qTclOg"
+    }
+  ],
+  "data analysis": [
+    {
+      "title": "Data Analysis for Business Analysts",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=ua-CiDNNj30"
+    }
+  ],
+  "communication": [
+    {
+      "title": "Business Communication Skills",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=ZQ1f0z8nC0Q"
+    }
+  ],
+  "documentation": [
+    {
+      "title": "BRD & FRD Documentation Explained",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=J9J7z2H0E7E"
+    }
+  ],
+  "recruitment": [
+    {
+      "title": "End-to-End Recruitment Process",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=Y4j0z4n5J9E"
+    }
+  ],
+  "employee relations": [
+    {
+      "title": "Employee Relations & HR Practices",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=Kz4lZz0JY8E"
+    }
+  ],
+  "hr tools": [
+    {
+      "title": "HRMS & ATS Tools Overview",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=V5yCz9L2A4M"
+    }
+  ],
+  "seo": [
+    {
+      "title": "SEO Full Course for Beginners",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=xsVTqzratPs"
+    }
+  ],
+  "content marketing": [
+    {
+      "title": "Content Marketing Strategy Explained",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=0R_3iarc6H0"
+    }
+  ],
+  "social media": [
+    {
+      "title": "Social Media Marketing Complete Guide",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=O3BUHwfHf84"
+    }
+  ],
+  "analytics": [
+    {
+      "title": "Google Analytics for Beginners",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=R0bK1T9W7kM"
+    }
+  ],
+  "project planning": [
+    {
+      "title": "Project Planning & Scheduling Basics",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=7m5p0Xz1BzA"
+    }
+  ],
+  "stakeholder management": [
+    {
+      "title": "Stakeholder Management Explained",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=E2Hq8g6R5jM"
+    }
+  ],
+  "agile": [
+    {
+      "title": "Agile & Scrum Fundamentals",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=Z9QbYZh1YXY"
+    }
+  ],
+  "risk management": [
+    {
+      "title": "Risk Management in Projects",
+      "type": "youtube",
+      "url": "https://www.youtube.com/watch?v=H6Jw5x1Jt4g"
+    }
   ]
 }
