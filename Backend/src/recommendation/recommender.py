@@ -1,23 +1,14 @@
-def recommend_learning(gap_result, resources_dict):
-    """
-    Generates learning recommendations for missing or weak skills.
-    Safe against partial gap schemas.
-    """
-
+def recommend_learning(gap_result: dict, resources: dict):
     recommendations = []
 
     missing = gap_result.get("missing", [])
     weak = gap_result.get("weak", [])
 
-    all_gaps = set(missing + weak)
-
-    for skill in all_gaps:
-        skill_lower = skill.lower()
-
-        if skill_lower in resources_dict:
+    for skill in missing + weak:
+        if skill in resources:
             recommendations.append({
-                "skill": skill_lower,
-                "resources": resources_dict[skill_lower]
+                "skill": skill,
+                "resources": resources[skill]
             })
 
     return recommendations

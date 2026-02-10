@@ -1,88 +1,41 @@
 from sentence_transformers import SentenceTransformer, util
 
-# Load embedding model once
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-
-# Tunable constants
-RULE_BASED_CONFIDENCE = 0.7   # strong but not perfect
-EMBEDDING_MAX_CONFIDENCE = 0.6
 
 
 def normalize_text(text: str) -> str:
     return " ".join(text.lower().split())
 
 
-def extract_skills_rule_based(tokens, skills_dict):
-    """
-    Detects skills using substring matching.
-    Assigns strong but non-perfect confidence.
-    """
-    scores = {}
-    joined_text = " ".join(tokens)
-
-    for skill in skills_dict:
-        skill_lower = skill.lower()
-        if skill_lower in joined_text:
-            scores[skill_lower] = RULE_BASED_CONFIDENCE
-
-    return scores
+def extract_skills_rule_based(text: str, skills: list):
+    found = {}
+    for skill in skills:
+        if skill.lower() in text:
+            found[skill.lower()] = 1.0
+    return found
 
 
-def extract_skills_embedding_based(text, skills_dict, threshold=0.45):
-    """
-    Uses sentence embeddings to detect semantically similar skills.
-    Produces soft confidence scores.
-    """
-    scores = {}
+def extract_skills_embedding_based(text: str, skills: list, threshold=0.45):
+    found = {}
+    text_emb = embedding_model.encode(text, convert_to_tensor=True)
 
-    if not text.strip():
-        return scores
+    for skill in skills:
+        skill_emb = embedding_model.encode(skill, convert_to_tensor=True)
+        sim = util.cos_sim(text_emb, skill_emb).item()
+        if sim >= threshold:
+            found[skill.lower()] = round(sim, 2)
 
-    text_embedding = embedding_model.encode(text, convert_to_tensor=True)
-
-    for skill in skills_dict:
-        skill_lower = skill.lower()
-        skill_embedding = embedding_model.encode(
-            skill_lower, convert_to_tensor=True
-        )
-
-        similarity = util.cos_sim(text_embedding, skill_embedding).item()
-
-        if similarity >= threshold:
-            # scale similarity to soft confidence
-            scores[skill_lower] = min(
-                round(float(similarity), 2),
-                EMBEDDING_MAX_CONFIDENCE
-            )
-
-    return scores
+    return found
 
 
-def combine_skill_scores(rule_scores, embed_scores):
-    """
-    Combines rule-based and embedding-based signals.
-    Rule-based dominates but does NOT saturate to 1.0.
-    """
+def extract_skills(text: str, skills: list):
+    text = normalize_text(text)
+
+    rule = extract_skills_rule_based(text, skills)
+    embed = extract_skills_embedding_based(text, skills)
+
     combined = {}
-
-    for skill in set(rule_scores) | set(embed_scores):
-        combined[skill] = max(
-            rule_scores.get(skill, 0.0),
-            embed_scores.get(skill, 0.0)
-        )
+    for s in set(rule) | set(embed):
+        combined[s] = max(rule.get(s, 0), embed.get(s, 0))
 
     return combined
-
-
-def extract_skills(text, skills_dict):
-    """
-    Unified skill extraction pipeline.
-    Returns confidence scores in range ~0.3–0.7
-    """
-    text = normalize_text(text)
-    tokens = text.split()
-
-    rule_scores = extract_skills_rule_based(tokens, skills_dict)
-    embed_scores = extract_skills_embedding_based(text, skills_dict)
-
-    return combine_skill_scores(rule_scores, embed_scores)

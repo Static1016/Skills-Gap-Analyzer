@@ -19,11 +19,6 @@ export default function Home() {
       return;
     }
 
-    if (!jobUrl) {
-      alert("Please paste a job opening link.");
-      return;
-    }
-
     if (!file) {
       alert("Please upload a resume PDF.");
       return;
@@ -34,15 +29,19 @@ export default function Home() {
 
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("category", category);
+      formData.append("role", role);
+      formData.append("resume", file); // MUST be 'resume'
 
-      const response = await fetch(
-        `${API_BASE}/analyze-job?category=${category}&role=${role}&job_input=${encodeURIComponent(jobUrl)}`,
-        {
-          method: "POST",
-          body: formData
-        }
-      );
+      // jobUrl is optional — only append if backend supports it
+      if (jobUrl) {
+        formData.append("job_input", jobUrl);
+      }
+
+      const response = await fetch(`${API_BASE}/analyze-job`, {
+        method: "POST",
+        body: formData
+      });
 
       if (!response.ok) {
         throw new Error("Backend error");
@@ -52,7 +51,7 @@ export default function Home() {
       setResult(data);
     } catch (err) {
       console.error(err);
-      alert("Analysis failed. Try another job link.");
+      alert("Analysis failed. Check backend logs.");
     } finally {
       setLoading(false);
     }
@@ -63,7 +62,7 @@ export default function Home() {
       <Header />
 
       <main className="max-w-6xl mx-auto px-6 py-10 space-y-6">
-        {/* Step 1: Role Selection */}
+        {/* Step 1 */}
         <div className="bg-white rounded-xl shadow p-6">
           <h3 className="font-semibold mb-4">
             1. Select Job Category & Role
@@ -77,10 +76,10 @@ export default function Home() {
           />
         </div>
 
-        {/* Step 2: Job Link */}
+        {/* Step 2 */}
         <div className="bg-white rounded-xl shadow p-6">
           <h3 className="font-semibold mb-4">
-            2. Paste Job Opening Link
+            2. Paste Job Opening Link (Optional)
           </h3>
           <input
             type="url"
@@ -91,7 +90,7 @@ export default function Home() {
           />
         </div>
 
-        {/* Step 3: Resume Upload */}
+        {/* Step 3 */}
         <div className="bg-white rounded-xl shadow p-6">
           <h3 className="font-semibold mb-4">
             3. Upload Resume (PDF)
@@ -103,7 +102,7 @@ export default function Home() {
           />
         </div>
 
-        {/* Analyze Button */}
+        {/* Button */}
         <button
           onClick={handleAnalyze}
           disabled={loading}
