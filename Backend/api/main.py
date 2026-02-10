@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, Form
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 import json
 
@@ -20,19 +20,9 @@ app.add_middleware(
 with open("data/roles/job_roles.json") as f:
     JOB_ROLES = json.load(f)
 
-# Simple learning resources
-RESOURCES = {
-    "api development": [
-        {"title": "REST APIs with FastAPI", "url": "https://www.youtube.com/watch?v=0sOvCWFmrtA"}
-    ],
-    "database design": [
-        {"title": "Database Design Basics", "url": "https://www.youtube.com/watch?v=ztHopE5Wnpc"}
-    ],
-    "python": [
-        {"title": "Python for Beginners", "url": "https://www.youtube.com/watch?v=rfscVS0vtbw"}
-    ]
-}
-
+# Load learning resources
+with open("data/skills/learning_resources.json") as f:
+    LEARNING_RESOURCES = json.load(f)
 
 @app.post("/analyze-job")
 async def analyze_job(
@@ -40,34 +30,26 @@ async def analyze_job(
     role: str = Form(...),
     resume: UploadFile = Form(...)
 ):
-    # Extract resume text
     resume_text = extract_text_from_pdf(resume)
 
-    # Load role skills
-    role_data = JOB_ROLES[category][role]
-    job_skills = {
-        k.lower(): float(v)
-        for k, v in role_data["skills"].items()
-    }
+    role_config = JOB_ROLES[category][role]
+    role_skills = {k.lower(): float(v) for k, v in role_config["skills"].items()}
+    role_label = role_config.get("label", role)
 
-    # Extract resume skills
-    resume_skills = extract_skills(resume_text, job_skills.keys())
+    resume_skills = extract_skills(resume_text, role_skills.keys())
 
-    # Match
-    result = match_resume_to_job(resume_skills, job_skills)
+    result = match_resume_to_job(resume_skills, role_skills)
 
-    recommendations = recommend_learning(result, RESOURCES)
+    recommendations = recommend_learning(result, LEARNING_RESOURCES)
 
     return {
         "job_fit_score": result["fit_score"],
-        "matched_skills": result["matched"],
-        "gaps": {
-            "missing": result["missing"],
-            "weak": result["weak"]
-        },
-        "recommendations": recommendations,
-        "role": role
+        "gaps": result["gaps"],
+        "skill_scores": result["skill_scores"],
+        "role": role_label,
+        "recommendations": recommendations
     }
+
 
 @app.get("/job-roles")
 def get_job_roles():

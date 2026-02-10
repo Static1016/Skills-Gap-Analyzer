@@ -27,6 +27,18 @@ def extract_skills_embedding_based(text: str, skills: list, threshold=0.45):
 
     return found
 
+def combine_skill_scores(rule_scores, embed_scores):
+    combined = {}
+
+    for skill in set(rule_scores) | set(embed_scores):
+        # Take max similarity instead of forcing 1.0
+        combined[skill] = round(
+            max(rule_scores.get(skill, 0.0), embed_scores.get(skill, 0.0)),
+            2
+        )
+
+    return combined
+
 
 def extract_skills(text: str, skills: list):
     text = normalize_text(text)

@@ -31,12 +31,7 @@ export default function Home() {
       const formData = new FormData();
       formData.append("category", category);
       formData.append("role", role);
-      formData.append("resume", file); // MUST be 'resume'
-
-      // jobUrl is optional — only append if backend supports it
-      if (jobUrl) {
-        formData.append("job_input", jobUrl);
-      }
+      formData.append("resume", file); // MUST match backend param name
 
       const response = await fetch(`${API_BASE}/analyze-job`, {
         method: "POST",
@@ -44,6 +39,8 @@ export default function Home() {
       });
 
       if (!response.ok) {
+        const err = await response.text();
+        console.error(err);
         throw new Error("Backend error");
       }
 
@@ -51,11 +48,13 @@ export default function Home() {
       setResult(data);
     } catch (err) {
       console.error(err);
-      alert("Analysis failed. Check backend logs.");
+      alert("Analysis failed.");
     } finally {
       setLoading(false);
     }
   };
+
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -106,11 +105,10 @@ export default function Home() {
         <button
           onClick={handleAnalyze}
           disabled={loading}
-          className={`w-full py-3 rounded text-white font-medium ${
-            loading
-              ? "bg-gray-400"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
+          className={`w-full py-3 rounded text-white font-medium ${loading
+            ? "bg-gray-400"
+            : "bg-blue-600 hover:bg-blue-700"
+            }`}
         >
           {loading ? "Analyzing..." : "Analyze Resume vs Job"}
         </button>

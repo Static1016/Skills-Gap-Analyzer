@@ -1,4 +1,4 @@
-def recommend_learning(gap_result: dict, resources: dict):
+def recommend_learning(gap_result, resources):
     recommendations = []
 
     missing = gap_result.get("missing", [])
