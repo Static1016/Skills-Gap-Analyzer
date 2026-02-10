@@ -39,15 +39,21 @@ async def analyze_job(
     resume_skills = extract_skills(resume_text, role_skills.keys())
 
     result = match_resume_to_job(resume_skills, role_skills)
+    print(result["gaps"])
+    print(LEARNING_RESOURCES.keys())
 
-    recommendations = recommend_learning(result, LEARNING_RESOURCES)
+
+    recommendations = recommend_learning(result["gaps"], LEARNING_RESOURCES)
+
+    print("RECOMMENDATIONS:", recommendations)
+
 
     return {
         "job_fit_score": result["fit_score"],
         "gaps": result["gaps"],
         "skill_scores": result["skill_scores"],
         "role": role_label,
-        "recommendations": recommendations
+        "recommendations": recommendations,
     }
 
 
