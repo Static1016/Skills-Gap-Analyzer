@@ -4,7 +4,13 @@ import FitDonut from "./FitDonut";
 export default function ResultCard({ data }) {
   if (!data) return null;
 
-  const { job_fit_score, gaps, recommendations, role } = data;
+  const {
+    job_fit_score,
+    gaps,
+    recommendations,
+    role,
+    confidence
+  } = data;
 
   return (
     <div className="space-y-10">
@@ -13,21 +19,30 @@ export default function ResultCard({ data }) {
         <div>
           <h4 className="font-semibold mb-3">Job Fit Overview</h4>
           <FitDonut score={job_fit_score} />
+
           {role && (
             <p className="text-sm text-gray-500 text-center mt-2">
               Match for {role}
             </p>
           )}
+
+          {/* Normalization explanation */}
+          <p className="text-xs text-gray-400 text-center mt-2">
+            Score is normalized using weighted skill relevance
+          </p>
         </div>
 
         <div>
-          <h4 className="font-semibold mb-3">Skill Gap Distribution</h4>
+          <h4 className="font-semibold mb-3">
+            Skill Gap Distribution
+          </h4>
           <SkillGapChart gaps={gaps} />
         </div>
       </div>
 
       {/* Skill lists */}
       <div className="grid md:grid-cols-2 gap-6">
+        {/* Missing */}
         <div>
           <h4 className="text-red-600 font-semibold mb-2">
             Missing Skills
@@ -35,14 +50,22 @@ export default function ResultCard({ data }) {
           {gaps.missing.length === 0 ? (
             <p className="text-sm text-gray-500">None 🎉</p>
           ) : (
-            <ul className="list-disc ml-5">
+            <ul className="list-disc ml-5 space-y-1">
               {gaps.missing.map((s) => (
-                <li key={s}>{s}</li>
+                <li key={s}>
+                  {s}
+                  {confidence?.[s] && (
+                    <span className="ml-2 text-xs text-gray-400">
+                      (confidence: {Math.round(confidence[s] * 100)}%)
+                    </span>
+                  )}
+                </li>
               ))}
             </ul>
           )}
         </div>
 
+        {/* Weak */}
         <div>
           <h4 className="text-yellow-600 font-semibold mb-2">
             Needs Improvement
@@ -50,9 +73,16 @@ export default function ResultCard({ data }) {
           {gaps.weak.length === 0 ? (
             <p className="text-sm text-gray-500">Looks good</p>
           ) : (
-            <ul className="list-disc ml-5">
+            <ul className="list-disc ml-5 space-y-1">
               {gaps.weak.map((s) => (
-                <li key={s}>{s}</li>
+                <li key={s}>
+                  {s}
+                  {confidence?.[s] && (
+                    <span className="ml-2 text-xs text-gray-400">
+                      (confidence: {Math.round(confidence[s] * 100)}%)
+                    </span>
+                  )}
+                </li>
               ))}
             </ul>
           )}
@@ -78,7 +108,7 @@ export default function ResultCard({ data }) {
               <p className="font-medium mb-1">
                 {rec.skill}
               </p>
-              <ul className="list-disc ml-5 text-sm">
+              <ul className="list-disc ml-5 text-sm space-y-1">
                 {rec.resources.map((res, idx) => (
                   <li key={idx}>
                     <a
@@ -89,6 +119,11 @@ export default function ResultCard({ data }) {
                     >
                       ▶️ {res.title}
                     </a>
+                    {res.type && (
+                      <span className="ml-2 text-xs text-gray-400">
+                        ({res.type})
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>

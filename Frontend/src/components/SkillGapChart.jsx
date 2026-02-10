@@ -4,31 +4,53 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  Cell
 } from "recharts";
 
 export default function SkillGapChart({ gaps }) {
-  const data = gaps.missing.map((skill) => ({
-    skill,
-    value: 100
-  }));
+  if (!gaps) return null;
+
+  const data = [
+    ...gaps.missing.map((s) => ({
+      skill: s,
+      value: 100,
+      type: "missing"
+    })),
+    ...gaps.weak.map((s) => ({
+      skill: s,
+      value: 50,
+      type: "weak"
+    }))
+  ];
 
   if (data.length === 0) {
     return (
       <p className="text-sm text-gray-500">
-        No missing skills 🎉
+        No skill gaps detected 🎉
       </p>
     );
   }
 
   return (
     <div style={{ width: "100%", height: 260 }}>
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer>
         <BarChart data={data}>
           <XAxis dataKey="skill" />
           <YAxis domain={[0, 100]} />
           <Tooltip />
-          <Bar dataKey="value" fill="#ef4444" />
+          <Bar dataKey="value">
+            {data.map((entry, index) => (
+              <Cell
+                key={index}
+                fill={
+                  entry.type === "missing"
+                    ? "#ef4444"   // red
+                    : "#facc15"   // yellow
+                }
+              />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>

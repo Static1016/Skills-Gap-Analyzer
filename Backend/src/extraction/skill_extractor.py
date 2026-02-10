@@ -31,23 +31,40 @@ def combine_skill_scores(rule_scores, embed_scores):
     combined = {}
 
     for skill in set(rule_scores) | set(embed_scores):
-        # Take max similarity instead of forcing 1.0
-        combined[skill] = round(
-            max(rule_scores.get(skill, 0.0), embed_scores.get(skill, 0.0)),
-            2
-        )
+        if skill in rule_scores:
+            combined[skill] = {
+                "score": 1.0,
+                "confidence": 0.9
+            }
+        else:
+            score = embed_scores.get(skill, 0.0)
+            combined[skill] = {
+                "score": round(score, 2),
+                "confidence": 0.6
+            }
 
     return combined
+
+
 
 
 def extract_skills(text: str, skills: list):
+    """
+    Returns:
+    {
+      "skill": {
+        "score": float (0–1),
+        "confidence": float (0–1)
+      }
+    }
+    """
+
     text = normalize_text(text)
+    tokens = text.split()
 
-    rule = extract_skills_rule_based(text, skills)
-    embed = extract_skills_embedding_based(text, skills)
+    rule_scores = extract_skills_rule_based(tokens, skills)
+    embed_scores = extract_skills_embedding_based(text, skills)
 
-    combined = {}
-    for s in set(rule) | set(embed):
-        combined[s] = max(rule.get(s, 0), embed.get(s, 0))
+    return combine_skill_scores(rule_scores, embed_scores)
 
-    return combined
+

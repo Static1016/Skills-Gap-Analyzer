@@ -30,31 +30,54 @@ async def analyze_job(
     role: str = Form(...),
     resume: UploadFile = Form(...)
 ):
+    # 1. Extract raw text
     resume_text = extract_text_from_pdf(resume)
 
+    # 2. Load role config
     role_config = JOB_ROLES[category][role]
-    role_skills = {k.lower(): float(v) for k, v in role_config["skills"].items()}
+    role_skills = {
+        k.lower(): float(v)
+        for k, v in role_config["skills"].items()
+    }
     role_label = role_config.get("label", role)
 
+    # 3. Extract skills WITH confidence
     resume_skills = extract_skills(resume_text, role_skills.keys())
+    # resume_skills = {
+    #   "python": {"score": 1.0, "confidence": 0.9},
+    #   "api development": {"score": 0.55, "confidence": 0.6}
+    # }
 
-    result = match_resume_to_job(resume_skills, role_skills)
-    print(result["gaps"])
-    print(LEARNING_RESOURCES.keys())
+    # 4. Separate score & confidence (IMPORTANT)
+    resume_skill_scores = {
+        skill: data["score"]
+        for skill, data in resume_skills.items()
+    }
 
+    resume_skill_confidence = {
+        skill: data["confidence"]
+        for skill, data in resume_skills.items()
+    }
 
-    recommendations = recommend_learning(result["gaps"], LEARNING_RESOURCES)
+    # 5. Match resume to job
+    result = match_resume_to_job(resume_skill_scores, role_skills)
 
-    print("RECOMMENDATIONS:", recommendations)
+    # 6. Recommendations
+    recommendations = recommend_learning(
+        result["gaps"],
+        LEARNING_RESOURCES
+    )
 
-
+    # 7. Response
     return {
         "job_fit_score": result["fit_score"],
         "gaps": result["gaps"],
         "skill_scores": result["skill_scores"],
+        "confidence": resume_skill_confidence,
         "role": role_label,
-        "recommendations": recommendations,
+        "recommendations": recommendations
     }
+
 
 
 @app.get("/job-roles")
