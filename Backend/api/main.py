@@ -24,14 +24,15 @@ with open("data/roles/job_roles.json") as f:
 with open("data/skills/learning_resources.json") as f:
     LEARNING_RESOURCES = json.load(f)
 
+
 @app.post("/analyze-job")
 async def analyze_job(
     category: str = Form(...),
     role: str = Form(...),
-    resume: UploadFile = Form(...)
+    resume: UploadFile = File(...)  # Fixed: was Form(...), should be File(...)
 ):
-    # 1. Extract raw text
-    resume_text = extract_text_from_pdf(resume)
+    # 1. Extract raw text — NOTE: must await since pdf_reader is now async
+    resume_text = await extract_text_from_pdf(resume)
 
     # 2. Load role config
     role_config = JOB_ROLES[category][role]
@@ -41,34 +42,33 @@ async def analyze_job(
     }
     role_label = role_config.get("label", role)
 
-    # 3. Extract skills WITH confidence
-    resume_skills = extract_skills(resume_text, role_skills.keys())
+    # 3. Extract skills WITH confidence scores
+    resume_skills = extract_skills(resume_text, list(role_skills.keys()))
     # resume_skills = {
-    #   "python": {"score": 1.0, "confidence": 0.9},
-    #   "api development": {"score": 0.55, "confidence": 0.6}
+    #   "python": {"score": 0.95, "confidence": 0.95},
+    #   "rest api": {"score": 0.72, "confidence": 0.80}
     # }
 
-    # 4. Separate score & confidence (IMPORTANT)
+    # 4. Separate score & confidence
     resume_skill_scores = {
         skill: data["score"]
         for skill, data in resume_skills.items()
     }
-
     resume_skill_confidence = {
         skill: data["confidence"]
         for skill, data in resume_skills.items()
     }
 
-    # 5. Match resume to job
+    # 5. Match resume to job role
     result = match_resume_to_job(resume_skill_scores, role_skills)
 
-    # 6. Recommendations
+    # 6. Generate learning recommendations for gaps
     recommendations = recommend_learning(
         result["gaps"],
         LEARNING_RESOURCES
     )
 
-    # 7. Response
+    # 7. Return response
     return {
         "job_fit_score": result["fit_score"],
         "gaps": result["gaps"],
@@ -78,6 +78,54 @@ async def analyze_job(
         "recommendations": recommendations
     }
 
+
+@app.post("/analyze-job-with-description")
+async def analyze_job_with_description(
+    category: str = Form(...),
+    role: str = Form(...),
+    resume: UploadFile = File(...),
+    job_description: str = Form("")
+):
+    """
+    Optional: if job_description is provided, blend role skills with
+    skills extracted from the JD for a more tailored analysis.
+    """
+    resume_text = await extract_text_from_pdf(resume)
+
+    role_config = JOB_ROLES[category][role]
+    role_skills = {
+        k.lower(): float(v)
+        for k, v in role_config["skills"].items()
+    }
+    role_label = role_config.get("label", role)
+
+    # If JD provided, extract skills from it and merge (JD skills weighted at 0.7 default)
+    if job_description.strip():
+        jd_skills = extract_skills(job_description, list(role_skills.keys()))
+        for skill, data in jd_skills.items():
+            if skill not in role_skills:
+                role_skills[skill] = 0.7  # add JD-only skills with moderate weight
+            # If already in role, slightly boost weight if JD also emphasizes it
+            else:
+                role_skills[skill] = min(role_skills[skill] * 1.1, 1.0)
+
+    resume_skills = extract_skills(resume_text, list(role_skills.keys()))
+
+    resume_skill_scores = {skill: data["score"] for skill, data in resume_skills.items()}
+    resume_skill_confidence = {skill: data["confidence"] for skill, data in resume_skills.items()}
+
+    result = match_resume_to_job(resume_skill_scores, role_skills)
+    recommendations = recommend_learning(result["gaps"], LEARNING_RESOURCES)
+
+    return {
+        "job_fit_score": result["fit_score"],
+        "gaps": result["gaps"],
+        "skill_scores": result["skill_scores"],
+        "confidence": resume_skill_confidence,
+        "role": role_label,
+        "recommendations": recommendations,
+        "jd_used": bool(job_description.strip())
+    }
 
 
 @app.get("/job-roles")
