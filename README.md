@@ -114,7 +114,7 @@ skill-gap-analyzer/
 
 -----------------------------------------------------------------
 
-## ▶How to Run Locally
+## How to Run Locally
 
 ### 1. Clone repository
 
