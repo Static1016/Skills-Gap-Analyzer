@@ -1,4 +1,4 @@
-# Skill Gap Analyzer 🧠📊
+# Skill Gap Analyzer 
 
 An end-to-end **AI/ML system** that analyzes a candidate’s resume, identifies skill gaps for a target role (ML Engineer), computes a job-fit score, and recommends a personalized learning path.
 
@@ -6,7 +6,7 @@ Built to simulate **real-world hiring intelligence systems** using NLP, Machine 
 
 -----------------------------------------------------------------
 
-## 🚀 Features
+## Features
 
 * Resume analysis (PDF & text)
 * Skill extraction using **hybrid NLP**:
@@ -21,7 +21,7 @@ Built to simulate **real-world hiring intelligence systems** using NLP, Machine 
 
 -----------------------------------------------------------------
 
-## 🧠 Problem Statement
+## Problem Statement
 
 Students and early professionals often struggle to understand:
 
@@ -33,7 +33,7 @@ This project solves that by **automating resume evaluation and guidance** using 
 
 -----------------------------------------------------------------
 
-## 🏗️ System Architecture (High Level)
+## System Architecture (High Level)
 
 ```
 Resume (PDF/Text)
@@ -57,7 +57,7 @@ FastAPI REST API
 
 -----------------------------------------------------------------
 
-## 🧪 ML & NLP Techniques Used
+## ML & NLP Techniques Used
 
 ### Natural Language Processing
 
@@ -77,7 +77,7 @@ FastAPI REST API
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 * **Language:** Python 3.11
 * **NLP:** spaCy, Sentence Transformers
@@ -89,7 +89,7 @@ FastAPI REST API
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 skill-gap-analyzer/
@@ -114,7 +114,7 @@ skill-gap-analyzer/
 
 -----------------------------------------------------------------
 
-## ▶️ How to Run Locally
+## ▶How to Run Locally
 
 ### 1. Clone repository
 
@@ -146,7 +146,7 @@ http://127.0.0.1:8000/docs
 
 -----------------------------------------------------------------
 
-## 📌 API Endpoints
+## API Endpoints
 
 ### `POST /analyze-text`
 
@@ -165,7 +165,7 @@ Upload and analyze a **PDF resume**.
 
 -----------------------------------------------------------------
 
-## 📈 Example Output
+## Example Output
 
 ```json
 {
@@ -186,7 +186,7 @@ Upload and analyze a **PDF resume**.
 
 -----------------------------------------------------------------
 
-## 🎯 Use Cases
+## Use Cases
 
 * Students preparing for ML/AI roles
 * Resume screening tools
@@ -195,7 +195,7 @@ Upload and analyze a **PDF resume**.
 
 -----------------------------------------------------------------
 
-## 🔮 Future Improvements
+## Future Improvements
 
 * Multiple target roles (Data Scientist, Backend, etc.)
 * Proficiency prediction using supervised ML
@@ -205,7 +205,7 @@ Upload and analyze a **PDF resume**.
 
 -----------------------------------------------------------------
 
-## 👤 Author
+## Author
 
 **Static**
 Aspiring ML Engineer
